@@ -1,8 +1,8 @@
-from data.tokenizer import TinyTokenizer
+from data.tokenizer import Tokenizer
+import data.tinyStoriesDataset
+import data.textToSqlDataset
 
-if __name__ == "__main__":
-    tknz = TinyTokenizer("train")
-
+def runTests(tknz):
     print("tknz.vocab_size()", tknz.vocab_size())
     print("tknz.sp.bos_id()", tknz.sp.bos_id())
     print("tknz.sp.pad_id()", tknz.sp.pad_id())
@@ -23,3 +23,8 @@ if __name__ == "__main__":
     print("txt_zoo", txt_zoo)
     for id in range(4):
         print(id, tknz.sp.id_to_piece(id), tknz.sp.is_control(id))
+
+if __name__ == "__main__":
+    runTests(Tokenizer("roneneldan/TinyStories","tiny_stories", data.tinyStoriesDataset.corpusWriter))
+    runTests(Tokenizer("b-mc2/sql-create-context","text_to_sql", data.textToSqlDataset.corpusWriter))
+
