@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.utils.data as data
 from model.transformer import Transformer
-from data.dataset import TinyStoriesData
+from data.textToSqlDataset import TextToSqlData
 import sentencepiece as spm
 import tqdm
 import constants
@@ -34,8 +34,8 @@ if constants.WANDB_ON:
 device = utilities.getDevice()
 print(f"Device = {device}")
 
-ds = TinyStoriesData("train")
-dl = torch.utils.data.DataLoader(ds, batch_size=constants.BATCH_SIZE, shuffle=True, collate_fn=ds.collate_function)
+ds = TextToSqlData("train")
+dl = torch.utils.data.DataLoader(ds, batch_size=constants.BATCH_SIZE, shuffle=True, collate_fn=ds.collate)
 
 # Generate random sample data
 # tgt_data = torch.randint(1, tgt_vocab_size, (64, max_seq_length))  # (batch_size, seq_length)
@@ -60,8 +60,8 @@ for epoch in range(start_epoch, constants.NUM_OF_EPOCHS):
   total_loss = 0
   for idx, tgt_data in tqdm.tqdm(enumerate(dl), desc=f"Epoch {epoch+1}/{constants.NUM_OF_EPOCHS}", unit="batch"):
     optimizer.zero_grad()
-    output = transformer(tgt_data[:, :-1].to(device))
-    loss = criterion(output.to(device).contiguous().view(-1, constants.VOCAB_SIZE), tgt_data[:, 1:].to(device).contiguous().view(-1))
+    output = transformer(tgt_data[0].to(device), tgt_data[1].to(device), tgt_data[2][:, :-1].to(device))
+    loss = criterion(output.to(device).contiguous().view(-1, constants.VOCAB_SIZE), tgt_data[2][:, 1:].to(device).contiguous().view(-1))
     loss.backward()
     optimizer.step()
     total_loss += loss.item()

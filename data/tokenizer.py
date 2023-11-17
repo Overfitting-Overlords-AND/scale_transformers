@@ -1,17 +1,23 @@
 import sentencepiece as spm
 import datasets
 import os
+import constants
 
-PREFIX = "tiny_stories"
 PACKAGE = "data"
 
+def corpusWriter(dataset,file):
+  for text in dataset:
+    file.write(text)
+ 
 # let's create a tokenizer class with an encode and decode function, a train function, shifting the ids,
-class TinyTokenizer:
-    def __init__(self, mode):
+class Tokenizer:
+    def __init__(self, dataset, prefix, corpusWriter=corpusWriter, mode="train"):
         self.mode = mode
-        self.prefix = f"{PREFIX}_{self.mode}"
+        self.prefix = f"{prefix}_{self.mode}" if mode else prefix
+        self.dataset = dataset
         self.modelName = f"{self.prefix}.model"
         self.corpusName = f"{self.prefix}.txt"
+        self.corpusWriter = corpusWriter
         self.sp = spm.SentencePieceProcessor()
         if not self.modelExists():
             if not self.corpusExists():
@@ -26,10 +32,9 @@ class TinyTokenizer:
         return self.sp.decode_ids(ids)
 
     def createCorpus(self):
-        dataset = datasets.load_dataset("roneneldan/TinyStories")
-        with open(self.corpusName,'w',encoding='utf-8') as file:
-            for text in dataset[self.mode]['text']:
-                file.write(text)
+        data = datasets.load_dataset(self.dataset)
+        with open(f"{PACKAGE}/{self.corpusName}", 'w', encoding='utf-8') as file:
+            self.corpusWriter(data[self.mode],file)
 
     def corpusExists(self):
         return os.path.exists(f"{PACKAGE}/{self.corpusName}")
@@ -39,10 +44,10 @@ class TinyTokenizer:
 
     def train(self):
         spm.SentencePieceTrainer.Train(
-            input=self.corpusName,
+            input=f"{PACKAGE}/{self.corpusName}",
             model_type="bpe",
-            model_prefix=self.prefix,
-            vocab_size=16000,
+            model_prefix=f"{PACKAGE}/{self.prefix}",
+            vocab_size=constants.VOCAB_SIZE,
             pad_id=0,
             unk_id=1,
             bos_id=2,
