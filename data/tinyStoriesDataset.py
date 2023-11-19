@@ -6,7 +6,7 @@ DATASET = "roneneldan/TinyStories"
 PREFIX = "tiny_stories"
 
 def corpusWriter(dataset,file):
-  for text in dataset['text']:
+  for text in dataset["train"]['text']:
     file.write(text)
     
 class TinyStoriesData(torch.utils.data.Dataset):

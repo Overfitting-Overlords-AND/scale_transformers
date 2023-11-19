@@ -163,3 +163,6 @@ wandb/
 data/tiny_stories_train.model
 data/tiny_stories_train.txt
 data/tiny_stories_train.vocab
+data/text_to_sql.model
+data/text_to_sql.txt
+data/text_to_sql.vocab

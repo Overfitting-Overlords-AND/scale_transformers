@@ -22,7 +22,7 @@ def generate(question, context):
   print("question shape: ", question.shape)
   context = torch.tensor(tknz.sp.encode_as_ids(context, add_bos=True)).long().unsqueeze(0)
   print("context shape: ", context.shape)
-  answer = torch.tensor([[1]]) # <s>=1
+  answer = torch.tensor([[2]]) # <bos>=2
   
   print("answer shape: ", answer.shape)
   transformer = Transformer().to(device)
