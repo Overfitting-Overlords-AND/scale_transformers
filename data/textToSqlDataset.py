@@ -37,13 +37,12 @@ class TextToSqlData(torch.utils.data.Dataset):
   def __getitem__(self, idx):
     record = self.dataset["train"][idx]
     encoded_question = self.tknz.sp.encode_as_ids(record["question"], add_bos=True, add_eos=True)
-    encoded_context = self.tknz.sp.encode_as_ids(record["context"], add_bos=True, add_eos=True)
+    encoded_context = self.tknz.sp.encode_as_ids(record["context"])
     encoded_answer = self.tknz.sp.encode_as_ids(record["answer"], add_bos=True, add_eos=True)
     return torch.tensor(encoded_question), torch.tensor(encoded_context), torch.tensor(encoded_answer)
   
   def collate(self, batch):
-    q = torch.nn.utils.rnn.pad_sequence([item[0] for item in batch], batch_first=True, padding_value=0)
-    c = torch.nn.utils.rnn.pad_sequence([item[1] for item in batch], batch_first=True, padding_value=0)
+    q = torch.nn.utils.rnn.pad_sequence([torch.cat((item[0],item[1]), dim=0) for item in batch], batch_first=True, padding_value=0)
     a = torch.nn.utils.rnn.pad_sequence([item[2] for item in batch], batch_first=True, padding_value=0)
-    return q, c, a
+    return q, a
   

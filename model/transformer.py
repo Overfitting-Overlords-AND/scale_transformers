@@ -22,8 +22,8 @@ class Transformer(nn.Module):
         self.fc = nn.Linear(constants.DIMENSIONS, constants.VOCAB_SIZE)
         self.dropout = nn.Dropout(constants.DROPOUT)
 
-    def generate_src_mask(self, query, context):
-        return (torch.cat((query, context), dim=1) != 0).unsqueeze(1).unsqueeze(2).to(device) # pad_id=0
+    def generate_src_mask(self, src):
+        return (src != 0).unsqueeze(1).unsqueeze(2).to(device) # pad_id=0
 
     def generate_tgt_mask(self, tgt):
         tgt_mask = (tgt != 0).unsqueeze(1).unsqueeze(3) # sentencepiece pad_id = 0
@@ -41,12 +41,10 @@ class Transformer(nn.Module):
       print(f"Total Parameters: {gpt_params} | Embedding: {emb_params}")
       return {"gpt_params": gpt_params, "emb_params": emb_params}
 
-    def forward(self, query, context, tgt):
-        src_mask = self.generate_src_mask(query, context)
+    def forward(self, src, tgt):
+        src_mask = self.generate_src_mask(src)
         tgt_mask = self.generate_tgt_mask(tgt)
-        q_emb = self.segment_embedding(torch.tensor(0).to(device)) + self.encoder_embedding(query)
-        c_emb = self.segment_embedding(torch.tensor(1).to(device)) + self.encoder_embedding(context)
-        src_embedded = self.dropout(self.positional_encoding(torch.cat((q_emb, c_emb), dim=1)))
+        src_embedded = self.dropout(self.positional_encoding(self.encoder_embedding(src)))        
         tgt_embedded = self.dropout(self.positional_encoding(self.decoder_embedding(tgt)))
 
         enc_output = src_embedded

@@ -31,7 +31,7 @@ def generate(question, context):
   
   for _ in range(constants.MAX_SEQ_LENGTH):
     with torch.no_grad():
-      logits = transformer(question, context, answer) 
+      logits = transformer(question, answer) 
       logits = logits[:, -1, :] / 1.0
       probs = torch.nn.functional.softmax(logits, dim=-1)
       next = torch.multinomial(probs, num_samples=1)

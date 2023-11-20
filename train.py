@@ -57,14 +57,14 @@ for epoch in range(start_epoch, constants.NUM_OF_EPOCHS):
     
     optimizer.zero_grad()
 
-    query, context, label = (x.to(device) for x in tgt_data)
+    query, label = (x.to(device) for x in tgt_data)
     label = label[:, :-1]   
-    output = transformer(query, context, label)
+    output = transformer(query, label)
 
     outputForLoss = output.to(device).contiguous().view(-1, constants.VOCAB_SIZE)
-    labelForLoss = tgt_data[2][:, 1:].to(device).contiguous().view(-1)
+    labelForLoss = tgt_data[1][:, 1:].to(device).contiguous().view(-1)
     loss = criterion(outputForLoss, labelForLoss)
-    
+
     loss.backward()
     optimizer.step()
     
@@ -86,12 +86,12 @@ for epoch in range(start_epoch, constants.NUM_OF_EPOCHS):
   
   for idx, tgt_data in tqdm.tqdm(enumerate(dl), desc=f"Epoch {epoch+1}/{constants.NUM_OF_EPOCHS}", unit="batch"):
     
-    query, context, label = (x.to(device) for x in tgt_data)
-    label = label[:, :-1]
-    output = transformer(query, context, label)
+    query, label = (x.to(device) for x in tgt_data)
+    label = label[:, :-1]   
+    output = transformer(query, label)
     
     outputForLoss = output.to(device).contiguous().view(-1, constants.VOCAB_SIZE)
-    labelForLoss = tgt_data[2][:, 1:].to(device).contiguous().view(-1)
+    labelForLoss = tgt_data[1][:, 1:].to(device).contiguous().view(-1)
     loss = criterion(outputForLoss, labelForLoss)
     
     total_loss, total_labels, correct = update_metrics(loss, outputForLoss, labelForLoss, total_loss, total_labels, correct)
