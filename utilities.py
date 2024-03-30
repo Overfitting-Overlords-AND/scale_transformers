@@ -2,6 +2,7 @@ import torch
 import os
 import re
 
+# Function to get the device
 def getDevice():
   is_cuda = torch.cuda.is_available()
   return "cuda:0" if is_cuda else "cpu"
