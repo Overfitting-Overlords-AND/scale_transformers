@@ -1,6 +1,6 @@
 from data.textToSqlDataset import TextToSqlData
 
-# Test the TextToSqlData class
+# Test the TextToSqlData class ya bas
 ds = TextToSqlData("train")
 print('ds.ds', ds.dataset)
 print(ds.__getitem__(0))
